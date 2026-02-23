@@ -36,6 +36,30 @@ AC_TYPE_UINT32_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memset])
 
+# Check for stack protector support (requires libssp or libc support)
+AC_MSG_CHECKING([whether $CC supports -fstack-protector-all])
+saved_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -fstack-protector-all"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+    [AC_MSG_RESULT([yes])
+     HARDENING_CFLAGS="-fstack-protector-all"],
+    [AC_MSG_RESULT([no])
+     HARDENING_CFLAGS=""])
+CFLAGS="$saved_CFLAGS"
+AC_SUBST([HARDENING_CFLAGS])
+
+# Check for PIE support (may not work on all architectures)
+AC_MSG_CHECKING([whether $CC supports -pie])
+saved_LDFLAGS="$LDFLAGS"
+LDFLAGS="$LDFLAGS -pie"
+AC_LINK_IFELSE([AC_LANG_PROGRAM([], [])],
+    [AC_MSG_RESULT([yes])
+     PIE_LDFLAGS="-pie"],
+    [AC_MSG_RESULT([no])
+     PIE_LDFLAGS=""])
+LDFLAGS="$saved_LDFLAGS"
+AC_SUBST([PIE_LDFLAGS])
+
 AC_CONFIG_FILES([Makefile
                  testdata/Makefile
                  src/Makefile])

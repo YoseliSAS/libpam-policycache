@@ -1,7 +1,7 @@
 AM_CFLAGS = $(GLIB_CFLAGS) -Wall -Werror \
 	    -DG_LOG_DOMAIN="\"pamcache\"" \
 	    -D_GNU_SOURCE=1 \
-	    -fPIC -fstack-protector-all -D_FORTIFY_SOURCE=2 \
+	    -fPIC $(HARDENING_CFLAGS) -D_FORTIFY_SOURCE=2 \
 	    -Wl,-z,relro,-z,now -Wformat -Wformat-security
 AM_LDFLAGS = $(GLIB_LIBS) -lpam -lcrypt -lscrypt -Wa,--noexecstack
 
@@ -40,11 +40,11 @@ pam_escalate_la_LDFLAGS = -shared -module -avoid-version \
 bin_PROGRAMS = pam-escalate-helper pam-policycache-import
 pam_escalate_helper_SOURCES = escalate_helper.c escalate_helper.h
 pam_escalate_helper_LDADD = libescalate.la
-pam_escalate_helper_LDFLAGS = $(AM_LDFLAGS) -pie
+pam_escalate_helper_LDFLAGS = $(AM_LDFLAGS) $(PIE_LDFLAGS)
 
 pam_policycache_import_SOURCES = import.c import.h
 pam_policycache_import_LDADD = libcache.la
-pam_policycache_import_LDFLAGS = $(AM_LDFLAGS) -pie
+pam_policycache_import_LDFLAGS = $(AM_LDFLAGS) $(PIE_LDFLAGS)
 
 install-exec-hook:
 	chmod u+s $(DESTDIR)$(bindir)/pam-escalate-helper
