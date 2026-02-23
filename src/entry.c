@@ -23,6 +23,15 @@
 
 #include "util.h"
 
+/*
+ * uClibc-ng compatibility: crypt_r() and struct crypt_data are glibc
+ * extensions not available in uClibc. Use non-reentrant crypt() instead.
+ * This is safe in PAM context as password validation is serialized.
+ */
+#if defined(__UCLIBC__) && !defined(__UCLIBC_HAS_CRYPT_R__)
+#define USE_CRYPT_COMPAT 1
+#endif
+
 #define CACHE_ENTRY_DEFAULT_ALGORITHM G_CHECKSUM_SHA256
 #define CACHE_ENTRY_DEFAULT_SALT_LENGTH 16
 
@@ -363,7 +372,9 @@ gboolean CacheEntryPasswordValidate(CacheEntry *self, const gchar *password,
   // statements.
   guint8 *hash_buf = NULL;
   GByteArray *salt = NULL;
+#ifndef USE_CRYPT_COMPAT
   struct crypt_data crypt_state;
+#endif
   char *hash_str = NULL;
 
   if (!self->hash) {
@@ -412,8 +423,12 @@ gboolean CacheEntryPasswordValidate(CacheEntry *self, const gchar *password,
     g_byte_array_append(salt, g_bytes_get_data(self->hash, NULL),
                         g_bytes_get_size(self->hash));
     g_byte_array_append(salt, (const guint8 *) "\0", 1);
+#ifdef USE_CRYPT_COMPAT
+    hash_str = crypt(password, (const char *) salt->data);
+#else
     crypt_state.initialized = 0;
     hash_str = crypt_r(password, (const char *) salt->data, &crypt_state);
+#endif
     g_byte_array_unref(salt);
     hash = g_bytes_new(hash_str, strlen(hash_str));
     break;
