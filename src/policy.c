@@ -19,6 +19,15 @@
 
 #include <netdb.h>
 
+/*
+ * uClibc-ng compatibility: innetgr() is used for NIS netgroup lookups
+ * which is not available in uClibc. Stub it to always return false,
+ * effectively disabling netgroup-based policy matching.
+ */
+#if defined(__UCLIBC__) && !defined(__UCLIBC_HAS_NISPLUS__)
+#define innetgr(netgroup, host, user, domain) 0
+#endif
+
 
 /**
  * CachePolicyNew:
