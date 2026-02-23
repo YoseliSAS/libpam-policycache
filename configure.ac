@@ -15,7 +15,7 @@ AM_PROG_AR
 LT_INIT
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.32.4])
 AC_CHECK_LIB([scrypt], [libscrypt_scrypt], [], [AC_MSG_ERROR([libscrypt not found])])
-AC_CHECK_LIB([crypt], [crypt], [], [AC_MSG_ERROR([libcrypt not found])])
+AC_SEARCH_LIBS([crypt], [crypt], [], [AC_MSG_ERROR([crypt function not found])])
 AC_CHECK_LIB([pam], [pam_start], [], [AC_MSG_ERROR([libpam not found])])
 
 # Checks for header files.

@@ -3,7 +3,7 @@ AM_CFLAGS = $(GLIB_CFLAGS) -Wall -Werror \
 	    -D_GNU_SOURCE=1 \
 	    -fPIC $(HARDENING_CFLAGS) -D_FORTIFY_SOURCE=2 \
 	    -Wl,-z,relro,-z,now -Wformat -Wformat-security
-AM_LDFLAGS = $(GLIB_LIBS) -lpam -lcrypt -lscrypt -Wa,--noexecstack
+AM_LDFLAGS = $(GLIB_LIBS) -lpam -lscrypt -Wa,--noexecstack
 
 
 # Common libraries for the tests, setuid helper, and the final PAM modules.
